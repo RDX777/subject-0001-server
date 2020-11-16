@@ -50,3 +50,9 @@ class MariaDBDiscador:
         select = "CALL spr_alert_net_pf_v2(DATE_SUB(CURDATE(), INTERVAL 2 DAY));"
         self.__conexao.execute(select)
         return self.__conexao.fetchall()
+
+
+    def _coleta_tabulacoes(self):
+        select = "CALL spr_classificacao_backoffice_module10();"
+        self.__conexao.execute(select)
+        return self.__conexao.fetchall()

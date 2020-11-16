@@ -1,3 +1,5 @@
+import pandas
+
 from classes.dadosexternoslocal import MariaDB
 
 class RegrasLocal(MariaDB):
@@ -42,3 +44,22 @@ class RegrasLocal(MariaDB):
             municipio,
             datacontrato,
             idticket)
+
+    
+    def insere_tabulacao(self,
+        tabulacaoid1,
+        tabulacaodescricao1,
+        tabulacaoid2,
+        tabulacaodescricao2,
+        tabulacaoid3,
+        tabulacaodescricao3):
+
+        if pandas.isnull(tabulacaoid3):
+            tabulacaoid3 = None
+
+        return self._insere_tabulacao(tabulacaoid1,
+        tabulacaodescricao1,
+        tabulacaoid2,
+        tabulacaodescricao2,
+        tabulacaoid3,
+        tabulacaodescricao3)

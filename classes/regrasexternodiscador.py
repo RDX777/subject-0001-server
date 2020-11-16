@@ -31,3 +31,9 @@ class RegrasDiscador(MariaDBDiscador):
         del objeto_pandas_completo
 
         return objeto_pandas_colunas[objeto_pandas_colunas.GRUPO_DE_TABULACAO.isin(['Auditor - Venda NETPF'])]
+
+
+    def coleta_tabulacoes(self):
+        objeto_pandas_completo = pandas.DataFrame(data=self._coleta_tabulacoes())
+
+        return objeto_pandas_completo
