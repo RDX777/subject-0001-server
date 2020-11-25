@@ -18,10 +18,19 @@ class MariaDB:
         self.__porta_bd = 3306
         self.__banco_bd = local.get_dados('bdlocal', 'base', 'one')['DadosSistema']
 
-        self._conexao = self._conectar_bd(self.__login_bd, self.__senha_bd, self.__endereco_bd, self.__porta_bd, self.__banco_bd)
+        self.__conexao_bd = self.__conectar(self.__login_bd, self.__senha_bd, self.__endereco_bd, self.__porta_bd, self.__banco_bd)
 
+        self.__conexao = self._conectar_bd()
 
-    def _conectar_bd(self, login_bd, senha_bd, endereco_bd, porta_bd, banco_bd):
+    
+    def __del__(self):
+        try:
+            self.desconectar()
+        except:
+            print('Desconectado do banco de dados {}' . format(self.__endereco_bd))
+    
+
+    def __conectar(self, login_bd, senha_bd, endereco_bd, porta_bd, banco_bd):
         conn = mariadb.connect(
             user=login_bd,
             password=senha_bd,
@@ -30,15 +39,15 @@ class MariaDB:
             database=banco_bd
             )
         conn.autocommit = True
-        return conn.cursor(dictionary=True)
-
-    
-    def __del__(self):
-        self._conexao.close()
+        return conn
 
 
-    def _desconectar(self):
-        self.__del__()
+    def _conectar_bd(self):
+        return self.__conexao_bd.cursor(dictionary=True)
+
+
+    def desconectar(self):
+        self.__conexao_bd.close()
 
     
     def _insere_vendas(self,
@@ -62,7 +71,7 @@ class MariaDB:
             )
         """
 
-        return self._conexao.execute(sp_procedure,
+        return self.__conexao.execute(sp_procedure,
                 (
                     sondagemid,
                     nome,
@@ -78,8 +87,54 @@ class MariaDB:
     def limpa_erro_desconhecido(self):
         sp_procedure = "CALL sp_limpa_erro_desconhecido()"
         try:
-            self._conexao.execute(sp_procedure)
+            self.__conexao.execute(sp_procedure)
             return True
         except mariadb.Error as e:
             print(e)
             return False
+
+
+    def limpa_pendente(self):
+        sp_procedure = "CALL sp_limpa_pendente()"
+        try:
+            self.__conexao.execute(sp_procedure)
+            return True
+        except mariadb.Error as e:
+            print(e)
+            return False
+
+
+    def _insere_tabulacao(self,
+        tabulacaoid1,
+        tabulacaodescricao1,
+        tabulacaoid2,
+        tabulacaodescricao2,
+        tabulacaoid3,
+        tabulacaodescricao3):
+
+        sp_procedure = "CALL sp_insere_tabulacoes(?, ?, ?, ?, ?, ?)"
+
+        self.__conexao.execute(sp_procedure,
+                (
+                    tabulacaoid1,
+                    tabulacaodescricao1,
+                    tabulacaoid2,
+                    tabulacaodescricao2,
+                    tabulacaoid3,
+                    tabulacaodescricao3
+                )
+            )
+
+        #return self.__conexao.fetchone()
+
+
+    def insere_ids_consulta_shell(self):
+        sp_procedure = "CALL sp_insere_idsondagem_consulta_shell()"
+        try:
+            self.__conexao.execute(sp_procedure)
+            return True
+        except mariadb.Error as e:
+            print(e)
+            return False
+
+
